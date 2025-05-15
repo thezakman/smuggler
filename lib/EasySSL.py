@@ -209,7 +209,7 @@ class EasySSL():
 							elif (CL_TE == 1):
 								state = ST_PROCESS_BODY_TE
 							else:
-								state = ST_PROCESS_NODATA
+								state = ST_PROCESS_BODY_NODATA
 								return (cls, dat_dec)
 							break
 						

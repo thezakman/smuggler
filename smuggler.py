@@ -376,10 +376,11 @@ if __name__ == "__main__":
 
 	Parser = argparse.ArgumentParser()
 	Parser.add_argument('-u', '--url', help="Target URL with Endpoint")
+	Parser.add_argument('-l', '--list', help="File containing list of URLs to test")
 	Parser.add_argument('-v', '--vhost', default="", help="Specify a virtual host")
 	Parser.add_argument('-x', '--exit_early', action='store_true',help="Exit scan on first finding")
 	Parser.add_argument('-m', '--method', default="POST", help="HTTP method to use (e.g GET, POST) Default: POST")
-	Parser.add_argument('-l', '--log', help="Specify a log file")
+	Parser.add_argument('--log', help="Specify a log file")
 	Parser.add_argument('-q', '--quiet', action='store_true', help="Quiet mode will only log issues found")
 	Parser.add_argument('-t', '--timeout', default=5.0, help="Socket timeout value Default: 5")
 	Parser.add_argument('--no-color', action='store_true', help="Suppress color codes")
@@ -398,16 +399,7 @@ if __name__ == "__main__":
 		print_info("Error: Smuggler requires Python 3.x")
 		sys.exit(1)
 
-	# If the URL argument is not specified then check stdin
-	if Args.url is None:
-		if sys.stdin.isatty():
-			print_info("Error: no direct URL or piped URL specified\n")
-			Parser.print_help()
-			exit(1)
-		Servers = sys.stdin.read().split("\n")
-	else:
-		Servers = [Args.url + " " + Args.method]
-
+	# Inicializa FileHandle primeiro
 	FileHandle = None
 	if Args.log is not None:
 		try:
@@ -416,6 +408,26 @@ if __name__ == "__main__":
 			print_info("Error: Issue with log file destination")
 			print(Parser.print_help())
 			sys.exit(1)
+
+	# Agora podemos usar FileHandle com segurança
+	# If the URL argument is not specified then check stdin
+	if Args.url is None and Args.list is None:
+		if sys.stdin.isatty():
+			print_info("Error: no direct URL, list file or piped URL specified\n")
+			Parser.print_help()
+			exit(1)
+		Servers = sys.stdin.read().split("\n")
+	elif Args.list is not None:
+		try:
+			with open(Args.list, 'r') as list_file:
+				Servers = list_file.read().split("\n")
+			print_info("Loading URLs from file: %s"%(Fore.CYAN + Args.list), FileHandle)
+			print_info("Found %s URLs to test"%(Fore.CYAN + str(len([s for s in Servers if s.strip()])) + Fore.MAGENTA), FileHandle)
+		except Exception as e:
+			print_info("Error: Could not read list file: %s"%(Fore.CYAN + str(e)), FileHandle)
+			exit(1)
+	else:
+		Servers = [Args.url + " " + Args.method]
 
 	for server in Servers:
 		# If the next on the list is blank, continue
