@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # MIT License
 # 
-# Copyright (c) 2020 Evan Custodio
+# Copyright (c) 2025 Evan Custodio & TheZakMan
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -53,10 +53,11 @@ class Desyncr():
 		self._exit_early = smargs.exit_early
 		self._attempts = 0
 		self._cookies = []
+		self._proxy = smargs.proxy
 
 	def _test(self, payload_obj):
 		try:
-			web = EasySSL(self.ssl_flag)
+			web = EasySSL(self.ssl_flag, proxy=self._proxy)
 			web.connect(self._host, self._port, self._timeout)
 			web.send(str(payload_obj).encode())
 			#print(payload_obj)
@@ -90,7 +91,7 @@ class Desyncr():
 		RN = "\r\n"
 		try:
 			cookies = []
-			web = EasySSL(self.ssl_flag)
+			web = EasySSL(self.ssl_flag, proxy=self._proxy)
 			web.connect(self._host, self._port, 2.0)
 			p = Payload()
 			p.host = self._host
@@ -379,13 +380,14 @@ if __name__ == "__main__":
 	Parser.add_argument('-t', '--timeout', default=5.0, help="Socket timeout value Default: 5")
 	Parser.add_argument('--no-color', action='store_true', help="Suppress color codes")
 	Parser.add_argument('-c', '--configfile', default="default.py", help="Filepath to the configuration file of payloads")
+	Parser.add_argument('--proxy', help="Specify a proxy server (e.g. http://127.0.0.1:8080)")
 	Args = Parser.parse_args()  # returns data from the options specified (echo)
 
 	NOCOLOR = Args.no_color
 	if os.name == 'nt':
 		NOCOLOR = True
 
-	Version = "v1.1"
+	Version = "v2.0"
 	banner(Version)
 
 	if sys.version_info < (3, 0):
@@ -436,6 +438,9 @@ if __name__ == "__main__":
 		print_info("Endpoint   : %s"%(Fore.CYAN + endpoint), FileHandle)
 		print_info("Configfile : %s"%(Fore.CYAN + configfile), FileHandle)
 		print_info("Timeout    : %s"%(Fore.CYAN + str(float(Args.timeout)) + Fore.MAGENTA + " seconds"), FileHandle)
+		
+		if Args.proxy:
+			print_info("Proxy      : %s"%(Fore.CYAN + Args.proxy), FileHandle)
 
 		sm = Desyncr(configfile, host, port, url=server[0], method=method, endpoint=endpoint, SSLFlag=SSLFlagval, logh=FileHandle, smargs=Args)
 		sm.run()

@@ -1,4 +1,3 @@
-
 def render_template(gadget):
 	RN = "\r\n"
 	p = Payload()
@@ -49,4 +48,3 @@ for i in range(0x7F,0x100):
 	mutations["postspace-%02x"%i] = render_template("Transfer-Encoding%c: chunked"%(i))
 	mutations["prespace-%02x"%i] = render_template("%cTransfer-Encoding: chunked"%(i))
 	mutations["endspace-%02x"%i] = render_template("Transfer-Encoding: chunked%c"%(i))
-	
