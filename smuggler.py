@@ -346,7 +346,7 @@ def CF(text):
 def banner(sm_version):
 	print(CF(Fore.RED))
 	print(CF(fr'''
-  █████████                                              ████         {Fore.WHITE}@TheZakMan{Fore.RED}    
+  █████████                                               ████        {Fore.WHITE}@TheZakMan{Fore.RED}    
  ███░░░░░███                                             ░░███          
 ░███    ░░░  █████████████   █████ ████  ███████  ███████ ░███   ██████  ████████ 
 ░░█████████ ░░███░░███░░███ ░░███ ░███  ███░░███ ███░░███ ░███  ███░░███░░███░░███
